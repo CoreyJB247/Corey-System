@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vehicle Control</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0d0f14;
+    --bg-panel: #141720;
+    --bg-card: #1a1e2b;
+    --bg-card-hover: #1f2435;
+    --accent-blue: #1a6fff;
+    --accent-green: #22c55e;
+    --accent-red: #ef4444;
+    --text-primary: #e8eaf0;
+    --text-secondary: #8b92a8;
+    --text-dim: #4a5068;
+    --border: rgba(255,255,255,0.06);
+    --tab-active: #1a6fff;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: transparent;
+    font-family: 'Exo 2', sans-serif;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 40px;
+    pointer-events: none;
+  }
+  #overlay.visible { display: flex; }
+
+  .panel {
+    width: 720px;
+    background: var(--bg-panel);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+    animation: fadeIn 0.2s cubic-bezier(0.22,1,0.36,1) both;
+    pointer-events: all;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Header */
+  .header {
+    background: var(--accent-blue);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-icon { font-size: 17px; }
+  .header-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .header-vehicle {
+    margin-left: auto;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .close-btn {
+    margin-left: 8px;
+    background: rgba(0,0,0,0.2);
+    border: none;
+    color: rgba(255,255,255,0.85);
+    width: 22px; height: 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .close-btn:hover { background: rgba(0,0,0,0.4); }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: var(--bg-dark);
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .tab:hover { color: var(--text-secondary); }
+  .tab.active {
+    color: #fff;
+    border-bottom-color: var(--tab-active);
+    background: rgba(26,111,255,0.05);
+  }
+
+  /* Content */
+  .content { padding: 14px; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* Two-column layout */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .section-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 7px;
+  }
+
+  /* Buttons */
+  .ctrl-btn {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+    text-align: left;
+  }
+  .ctrl-btn:last-child { margin-bottom: 0; }
+  .ctrl-btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .ctrl-btn.active-green {
+    background: rgba(34,197,94,0.1);
+    border-color: rgba(34,197,94,0.4);
+    color: var(--accent-green);
+  }
+  .ctrl-btn.active-blue {
+    background: rgba(26,111,255,0.12);
+    border-color: rgba(26,111,255,0.45);
+    color: #6aa3ff;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .ctrl-btn.active-green .status-dot { background: var(--accent-green); box-shadow: 0 0 5px var(--accent-green); }
+  .ctrl-btn.active-blue  .status-dot { background: #6aa3ff; box-shadow: 0 0 5px #6aa3ff; }
+
+  .check-mark {
+    margin-left: auto;
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .ctrl-btn.active-green .check-mark,
+  .ctrl-btn.active-blue  .check-mark { opacity: 1; }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 0;
+  }
+
+  /* Status bar */
+  .status-bar {
+    background: var(--bg-dark);
+    border-top: 1px solid var(--border);
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--text-dim);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+  .status-item .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--text-dim);
+  }
+  .status-item.on .dot { background: var(--accent-green); box-shadow: 0 0 4px var(--accent-green); }
+  .status-item.on { color: var(--accent-green); }
+
+  .key-hint {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  kbd {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: inherit;
+    font-size: 10px;
+    color: var(--text-secondary);
+  }
+
+  /* Doors & Seats icon grid */
+  .ds-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 14px;
+  }
+  .ds-col {}
+  .icon-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 6px;
+  }
+  .icon-grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .icon-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px 6px;
+    gap: 4px;
+    transition: all 0.15s;
+    font-family: 'Exo 2', sans-serif;
+  }
+  .icon-btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .icon-btn.active-yellow {
+    background: rgba(234,179,8,0.15);
+    border-color: rgba(234,179,8,0.5);
+    color: #eab308;
+  }
+  .icon-btn.active-green {
+    background: rgba(34,197,94,0.12);
+    border-color: rgba(34,197,94,0.4);
+    color: var(--accent-green);
+  }
+  .icon-glyph { font-size: 16px; line-height: 1; }
+  .icon-label { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
+  .ds-full-btn { margin-top: 2px; justify-content: center; }
+
+  /* Notify toast */
+  #notify {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50px);
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 9px 16px;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+    transition: transform 0.22s cubic-bezier(0.22,1,0.36,1), opacity 0.22s;
+    opacity: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #notify.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #notify.success { border-left: 3px solid var(--accent-green); }
+  #notify.error   { border-left: 3px solid var(--accent-red); }
+  #notify.info    { border-left: 3px solid var(--accent-blue); }
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <div class="panel">
+
+    <!-- Header -->
+    <div class="header">
+      <span class="header-icon">🚗</span>
+      <span class="header-title">Vehicle Control</span>
+      <span class="header-vehicle" id="vehicleLabel">No Vehicle</span>
+      <button class="close-btn" onclick="closeMenu()">✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('controls')" id="tab-controls">
+        ☰ Controls
+      </div>
+      <div class="tab" onclick="switchTab('doors')" id="tab-doors">
+        🚪 Doors &amp; Seats
+      </div>
+      <div class="tab" onclick="switchTab('extras')" id="tab-extras">
+        ✨ Extras &amp; Liveries
+      </div>
+    </div>
+
+    <!-- Controls Tab -->
+    <div class="content">
+      <div class="tab-pane active" id="pane-controls">
+        <div class="two-col">
+
+          <!-- Left: Controls -->
+          <div>
+            <div class="section-label">Controls</div>
+
+            <button class="ctrl-btn" onclick="action('repairVehicle')">
+              🔧 Repair
+            </button>
+
+            <button class="ctrl-btn" onclick="action('washVehicle')">
+              💧 Wash Vehicle
+            </button>
+
+            <button class="ctrl-btn" id="btn-engine" onclick="action('toggleEngine')">
+              <span class="status-dot"></span>
+              ⚡ Engine Always On
+              <span class="check-mark">✓</span>
+            </button>
+
+          </div>
+
+          <!-- Right: Locking System -->
+          <div>
+            <div class="section-label">Locking System</div>
+
+            <button class="ctrl-btn" id="btn-personal" onclick="action('setPersonalVehicle')">
+              <span class="status-dot"></span>
+              🔑 Set Personal Vehicle
+              <span class="check-mark">✓</span>
+            </button>
+
+            <button class="ctrl-btn" id="btn-keyless" onclick="action('toggleKeyless')">
+              <span class="status-dot"></span>
+              📡 Keyless Entry
+              <span class="check-mark">✓</span>
+            </button>
+
+            <button class="ctrl-btn" id="btn-tracking" onclick="action('toggleTracking')">
+              <span class="status-dot"></span>
+              📍 Tracking
+              <span class="check-mark">✓</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Doors & Seats Tab -->
+      <div class="tab-pane" id="pane-doors">
+        <div class="ds-grid">
+          <div class="ds-col">
+            <div class="section-label">Doors</div>
+            <div class="icon-grid" id="doors-grid"></div>
+            <button class="ctrl-btn ds-full-btn" onclick="action('toggleAllDoors')">🚪 Toggle All Doors</button>
+          </div>
+          <div class="ds-col">
+            <div class="section-label">Windows</div>
+            <div class="icon-grid">
+              <button class="icon-btn" id="ibtn-win0" onclick="action('toggleWindow0')"><span class="icon-glyph">🪟</span><span class="icon-label">FL</span></button>
+              <button class="icon-btn" id="ibtn-win1" onclick="action('toggleWindow1')"><span class="icon-glyph">🪟</span><span class="icon-label">FR</span></button>
+              <div></div>
+              <button class="icon-btn" id="ibtn-win2" onclick="action('toggleWindow2')"><span class="icon-glyph">🪟</span><span class="icon-label">RL</span></button>
+              <button class="icon-btn" id="ibtn-win3" onclick="action('toggleWindow3')"><span class="icon-glyph">🪟</span><span class="icon-label">RR</span></button>
+              <div></div>
+            </div>
+            <button class="ctrl-btn ds-full-btn" onclick="action('allWindows')">🪟 All Windows</button>
+          </div>
+          <div class="ds-col">
+            <div class="section-label">Seats</div>
+            <div class="icon-grid icon-grid-3" id="seats-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extras & Liveries Tab -->
+      <div class="tab-pane" id="pane-extras">
+        <div class="two-col">
+          <div>
+            <div class="section-label">Extras</div>
+            <div class="icon-grid icon-grid-3" id="extras-grid">
+              <div class="section-label" style="grid-column:1/-1;color:var(--text-dim);font-size:11px">Enter a vehicle to see extras</div>
+            </div>
+          </div>
+          <div>
+            <div class="section-label">Livery</div>
+            <div id="livery-list" style="max-height:160px;overflow-y:auto">
+              <div class="section-label" style="color:var(--text-dim);font-size:11px">Enter a vehicle to see liveries</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-item" id="stat-personal"><div class="dot"></div> Personal</div>
+      <div class="status-item" id="stat-tracking"><div class="dot"></div> Tracking</div>
+      <div class="status-item" id="stat-keyless"><div class="dot"></div> Keyless</div>
+      <div class="key-hint"><kbd>PgUp</kbd> Open &nbsp;|&nbsp; <kbd>PgDn</kbd> Lock &nbsp;|&nbsp; <kbd>Esc</kbd> Close</div>
+    </div>
+
+  </div>
+</div>
+
+<div id="notify"></div>
+
+<script>
+  var state = {
+    inVehicle: false,
+    isPersonalVehicle: false,
+    trackingEnabled: false,
+    keylessEnabled: false,
+    engineAlwaysOn: false,
+    vehicleName: 'None',
+    vehicleData: null
+  };
+
+  var resourceName = window.GetParentResourceName ? window.GetParentResourceName() : 'vehicle_control';
+
+  function nuiFetch(endpoint, data) {
+    fetch('https://' + resourceName + '/' + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data || {})
+    }).catch(function() {});
+  }
+
+  function action(name) { nuiFetch(name); }
+
+  function closeMenu() {
+    nuiFetch('closeMenu');
+    document.getElementById('overlay').classList.remove('visible');
+  }
+
+  window.addEventListener('message', function(e) {
+    var d = e.data;
+    if (d.type === 'toggleMenu') {
+      document.getElementById('overlay').classList.toggle('visible', d.show);
+    }
+    if (d.type === 'updateState') {
+      Object.assign(state, d);
+      renderState();
+      if (d.vehicleData) renderVehicleData(d.vehicleData);
+    }
+    if (d.type === 'notify') { showNotify(d.message, d.level || 'info'); }
+    if (d.type === 'doorState') {
+      var btn = document.getElementById('ibtn-door' + d.door);
+      if (btn) btn.classList.toggle('active-yellow', d.open);
+    }
+    if (d.type === 'windowState') {
+      var wbtn = document.getElementById('ibtn-win' + d.win);
+      if (wbtn) wbtn.classList.toggle('active-blue', d.open);
+    }
+    if (d.type === 'extraState') {
+      var ebtn = document.getElementById('ibtn-extra' + d.extra);
+      if (ebtn) ebtn.classList.toggle('active-yellow', d.on);
+    }
+  });
+
+  // --- Door labels ---
+  var doorLabels = {0:'FL',1:'FR',2:'RL',3:'RR',4:'Hood',5:'Trunk',6:'Extra 1',7:'Extra 2'};
+  var doorGlyphs = {0:'🚪',1:'🚪',2:'🚪',3:'🚪',4:'🔲',5:'🔲',6:'🚪',7:'🚪'};
+
+  // --- Seat labels ---
+  var seatLabels = {'-1':'Driver',0:'Front Pass',1:'Rear Left',2:'Rear Right',
+                     3:'Row 3 L',4:'Row 3 Mid',5:'Row 3 R',6:'Seat 8',7:'Seat 9'};
+
+  function renderVehicleData(vd) {
+    // --- Doors ---
+    var dg = document.getElementById('doors-grid');
+    if (dg) {
+      dg.innerHTML = '';
+      (vd.doors || []).forEach(function(door) {
+        var btn = document.createElement('button');
+        btn.className = 'icon-btn' + (door.open ? ' active-yellow' : '');
+        btn.id = 'ibtn-door' + door.index;
+        btn.onclick = function() { action('toggleDoor' + door.index); };
+        btn.innerHTML = '<span class="icon-glyph">' + (doorGlyphs[door.index] || '🚪') + '</span>' +
+                        '<span class="icon-label">' + (doorLabels[door.index] || 'Door') + '</span>';
+        dg.appendChild(btn);
+      });
+    }
+
+    // --- Seats ---
+    var sg = document.getElementById('seats-grid');
+    if (sg) {
+      sg.innerHTML = '';
+      var numSeats = vd.numSeats || 2;
+      // Driver always
+      var seatIndices = [-1];
+      for (var i = 0; i < numSeats - 1; i++) seatIndices.push(i);
+
+      seatIndices.forEach(function(si) {
+        var btn = document.createElement('button');
+        btn.className = 'icon-btn';
+        btn.id = 'ibtn-seat' + si;
+        var siStr = String(si);
+        btn.onclick = (function(s) { return function() { nuiFetch('getSeat', { seat: s }); }; })(si);
+        btn.innerHTML = '<span class="icon-glyph">🪑</span>' +
+                        '<span class="icon-label">' + (seatLabels[siStr] || 'Seat ' + (si+2)) + '</span>';
+        sg.appendChild(btn);
+      });
+    }
+
+    // --- Extras ---
+    var eg = document.getElementById('extras-grid');
+    if (eg) {
+      eg.innerHTML = '';
+      if (!vd.extras || vd.extras.length === 0) {
+        eg.innerHTML = '<div class="section-label" style="grid-column:1/-1;color:var(--text-dim);font-size:11px">No extras on this vehicle</div>';
+      } else {
+        vd.extras.forEach(function(extra) {
+          var btn = document.createElement('button');
+          btn.className = 'icon-btn' + (extra.on ? ' active-yellow' : '');
+          btn.id = 'ibtn-extra' + extra.index;
+          btn.onclick = (function(idx) { return function() { nuiFetch('toggleExtra', { extra: idx }); }; })(extra.index);
+          btn.innerHTML = '<span class="icon-glyph">⚙️</span>' +
+                          '<span class="icon-label">Extra ' + extra.index + '</span>';
+          eg.appendChild(btn);
+        });
+      }
+    }
+
+    // --- Liveries ---
+    var ll = document.getElementById('livery-list');
+    if (ll) {
+      ll.innerHTML = '';
+      if (!vd.liveries || vd.liveries.length === 0) {
+        ll.innerHTML = '<div class="section-label" style="color:var(--text-dim);font-size:11px">No liveries on this vehicle</div>';
+      } else {
+        vd.liveries.forEach(function(liv) {
+          var btn = document.createElement('button');
+          btn.className = 'ctrl-btn' + (liv.index === vd.currentLivery ? ' active-blue' : '');
+          btn.id = 'ibtn-liv' + liv.index;
+          btn.onclick = (function(idx) { return function() { nuiFetch('setLivery', { livery: idx }); }; })(liv.index);
+          btn.innerHTML = '🎨 ' + liv.label;
+          btn.style.marginBottom = '5px';
+          ll.appendChild(btn);
+        });
+      }
+    }
+  }
+
+  function renderState() {
+    document.getElementById('vehicleLabel').textContent =
+      state.inVehicle ? state.vehicleName : 'No Vehicle';
+    setActive('btn-personal',  state.isPersonalVehicle, 'green');
+    setActive('btn-tracking',  state.trackingEnabled,   'blue');
+    setActive('btn-keyless',   state.keylessEnabled,    'blue');
+    setActive('btn-engine',    state.engineAlwaysOn,    'blue');
+    toggleStatus('stat-personal', state.isPersonalVehicle);
+    toggleStatus('stat-tracking', state.trackingEnabled);
+    toggleStatus('stat-keyless',  state.keylessEnabled);
+  }
+
+  function setActive(id, isOn, color) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('active-green', 'active-blue');
+    if (isOn) el.classList.add(color === 'green' ? 'active-green' : 'active-blue');
+  }
+
+  function toggleStatus(id, isOn) {
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle('on', isOn);
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-pane').forEach(function(t) { t.classList.remove('active'); });
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('pane-' + tab).classList.add('active');
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  var notifyTimer = null;
+  function showNotify(msg, level) {
+    level = level || 'info';
+    var el = document.getElementById('notify');
+    el.innerHTML = '';
+    var icons = { success: '✔', error: '✖', info: 'ℹ', inform: 'ℹ' };
+    var icon = document.createElement('span');
+    icon.textContent = icons[level] || 'ℹ';
+    var text = document.createElement('span');
+    text.textContent = msg;
+    el.appendChild(icon);
+    el.appendChild(text);
+    el.className = 'show ' + level;
+    clearTimeout(notifyTimer);
+    notifyTimer = setTimeout(function() { el.classList.remove('show'); }, 3000);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+Citizen.CreateThread(function()
+    AddTextEntryByHash(0xAC9F694E, 'Route 13')
+    AddTextEntryByHash(0x9B01C923, 'Route 13')
+    AddTextEntryByHash(0xF5DE6511, 'Route 15')
+    AddTextEntryByHash(0xE7932A4B, 'Route 1')
+end)
