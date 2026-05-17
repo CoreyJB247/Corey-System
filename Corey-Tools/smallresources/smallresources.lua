@@ -102,7 +102,8 @@ if Config.weaponReticle then
             local isSniper = (currentWeaponHash == 100416529 or
                               currentWeaponHash == 205991906 or
                               currentWeaponHash == -952879014 or
-                              currentWeaponHash == GetHashKey('WEAPON_HEAVYSNIPER_MK2'))
+                              currentWeaponHash == GetHashKey('WEAPON_HEAVYSNIPER_MK2') or
+                              currentWeaponHash == GetHashKey('WEAPON_VICTUSXMR'))
 
             if not isSniper then
                 HideHudComponentThisFrame(14)

@@ -40,14 +40,17 @@ Config.VehicleCategories = {
                 }
             },
             {
-                title = "Detectives",
+                title = "SASP Detectives (CID)",
                 vehicles = {
-                    {model = "rav4hyb", name = "2024 Toyota Rav4"},
-            {model = "25umfpiu", name = "2025 Ford Explorer"},
-            {model = "fldurango", name = "2018 Dodge Durango"},
-            {model = "fl2020", name = "2020 Ford Explorer"},
-            {model = "ramfl", name = "2023 Dodge Ram"},
-            {model = "ACTTOxr6UM", name = "2016 Ford Falcon"},
+                    {model = "detec1", name = "2020 Ford FPIU"},
+                    {model = "detec2", name = "2016 Ford Fusion"},
+                    {model = "detec3", name = "2020 Dodge Durango"},
+                    {model = "um3", name = "2011 Ford CVPI"},
+                    {model = "fbimalibu", name = "2013 Chevy Malibu"},
+                    {model = "fbi22tahoe", name = "2022 Chevy Tahoe"},
+                    {model = "fbi6", name = "2016 Ford FPIU"},
+                    {model = "fbi4", name = "2020 Dodge Charger"},
+                    {model = "ramfl", name = "2017 Dodge Ram"},
                 }
             },
             {
@@ -64,6 +67,16 @@ Config.VehicleCategories = {
                     {model = "v19tahoe", name = "2019 Chevy Tahoe"},
                     {model = "v21durango", name = "2021 Dodge Durango"},
                     {model = "vf150", name = "2021 Ford F-150"},
+                }
+            },
+            {
+                title = "San Andreas State Police SWAT",
+                vehicles = {
+                    {model = "swat22tahoe", name = "2022 Chevy Tahoe Armoured"},
+                    {model = "swatexpedition", name = "2022 Ford Expedition Armoured"},
+                    {model = "swatraptor", name = "2022 Ford F-150 Raptor Armoured"},
+                    {model = "SWATVAN", name = "2023 Mercedes Sprinter Armoured"},
+                    {model = "tahoeswat", name = "2019 Chevy Tahoe Armoured"},
                 }
             },
             {
