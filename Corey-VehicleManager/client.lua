@@ -472,27 +472,54 @@ function openVehicleModsMenu()
 end
 
 -- ==================== VISUAL MODS ====================
--- GTA V visual mod type IDs and human-readable names.
+-- Mod type IDs sourced from the official CitizenFX/GTA V eVehicleModType enum.
+-- Performance & toggle mods (11-18, 22-24) are handled in their own menus.
+-- Horn (14) is handled in Windows/Plate/Horn menu.
 local visualModDefs = {
-    { modType = 0,  title = 'Spoiler',        icon = 'car' },
-    { modType = 1,  title = 'Front Bumper',   icon = 'car' },
-    { modType = 2,  title = 'Rear Bumper',    icon = 'car' },
-    { modType = 3,  title = 'Side Skirts',    icon = 'car' },
-    { modType = 4,  title = 'Exhaust',        icon = 'wind' },
-    { modType = 5,  title = 'Frame',          icon = 'car' },
-    { modType = 6,  title = 'Grille',         icon = 'car' },
-    { modType = 7,  title = 'Hood',           icon = 'car' },
-    { modType = 8,  title = 'Fender',         icon = 'car' },
-    { modType = 9,  title = 'Right Fender',   icon = 'car' },
-    { modType = 10, title = 'Roof',           icon = 'car' },
-    { modType = 25, title = 'Plaques',        icon = 'id-badge' },
-    { modType = 27, title = 'Trim',           icon = 'car' },
-    { modType = 28, title = 'Ornaments',      icon = 'star' },
-    { modType = 30, title = 'Dial Design',    icon = 'gauge' },
-    { modType = 33, title = 'Steering Wheel', icon = 'circle' },
-    { modType = 34, title = 'Shift Lever',    icon = 'car' },
-    { modType = 38, title = 'Hydraulics',     icon = 'arrows-up-down' },
-    { modType = 48, title = 'Livery',         icon = 'palette' },
+    -- ── Exterior body ──────────────────────────────────────────────
+    { modType = 0,  title = 'Spoiler',            icon = 'car' },
+    { modType = 1,  title = 'Front Bumper',        icon = 'car' },
+    { modType = 2,  title = 'Rear Bumper',         icon = 'car' },
+    { modType = 3,  title = 'Side Skirts',         icon = 'car' },
+    { modType = 4,  title = 'Exhaust',             icon = 'wind' },
+    { modType = 5,  title = 'Roll Cage / Frame',   icon = 'car' },
+    { modType = 6,  title = 'Grille',              icon = 'car' },
+    { modType = 7,  title = 'Hood',                icon = 'car' },
+    { modType = 8,  title = 'Left Fender',         icon = 'car' },
+    { modType = 9,  title = 'Right Fender',        icon = 'car' },
+    { modType = 10, title = 'Roof',                icon = 'car' },
+    -- 11 = Engine (perf), 12 = Brakes (perf), 13 = Gearbox (perf)
+    -- 14 = Horn → Windows/Plate/Horn menu
+    -- 15 = Suspension (perf), 16 = Armour (perf), 17 = Nitrous (perf)
+    -- 18 = Turbo (perf toggle), 19 = Subwoofer, 20 = Tyre Smoke → Wheels menu
+    -- 21 = Hydraulics → Wheels menu, 22 = Xenon Lights (toggle) → Lights menu
+    -- 23/24 = Wheels → Wheels menu
+
+    -- ── Interior & cosmetic ─────────────────────────────────────────
+    { modType = 25, title = 'Plate Holder',        icon = 'id-badge' },
+    { modType = 26, title = 'Vanity Plates',       icon = 'id-badge' },
+    { modType = 27, title = 'Trim (Interior 1)',   icon = 'car' },
+    { modType = 28, title = 'Trim (Interior 2)',   icon = 'car' },
+    { modType = 29, title = 'Dashboard',           icon = 'gauge' },
+    { modType = 30, title = 'Dial Design',         icon = 'gauge' },
+    { modType = 31, title = 'Trim (Interior 3)',   icon = 'car' },
+    { modType = 32, title = 'Trim (Interior 4)',   icon = 'car' },
+    { modType = 33, title = 'Seats',               icon = 'couch' },
+    { modType = 34, title = 'Steering Wheel',      icon = 'circle' },
+    { modType = 35, title = 'Shift Lever',         icon = 'car' },
+    { modType = 36, title = 'Plaques',             icon = 'id-badge' },
+    { modType = 37, title = 'Ice / Bling',         icon = 'gem' },
+    { modType = 38, title = 'Trunk',               icon = 'box' },
+    { modType = 39, title = 'Engine Bay (Hydro)',  icon = 'arrows-up-down' },
+    { modType = 40, title = 'Engine Bay 1',        icon = 'gear' },
+    { modType = 41, title = 'Engine Bay 2',        icon = 'gear' },
+    { modType = 42, title = 'Engine Bay 3',        icon = 'gear' },
+    { modType = 43, title = 'Chassis 2',           icon = 'car' },
+    { modType = 44, title = 'Chassis 3',           icon = 'car' },
+    { modType = 45, title = 'Chassis 4',           icon = 'car' },
+    { modType = 46, title = 'Chassis 5',           icon = 'car' },
+    { modType = 47, title = 'Door (Left)',          icon = 'door-open' },
+    { modType = 48, title = 'Door (Right)',         icon = 'door-open' },
 }
 
 
@@ -550,8 +577,6 @@ function openVisualModsMenu()
                         next = cur + 1
                     end
                     SetVehicleMod(veh, modType, next, false)
-                    local nextLabel = getModOptionLabel(veh, modType, next, c)
-                    lib.notify({title = modTitle, description = nextLabel, type = 'success'})
                     -- Wait for ox_lib to finish closing before re-opening
                     CreateThread(function()
                         Wait(100)
@@ -716,22 +741,22 @@ function openPerformanceModsMenu()
 
     local options = {
         {
-            title = 'Engine (Level ' .. (engineLevel == -1 and 'Stock' or engineLevel) .. ')',
+            title = 'Engine (Level ' .. (engineLevel == -1 and 'Stock' or engineLevel + 1) .. ')',
             description = 'Select engine upgrade level',
             onSelect = function() openModLevelMenu(veh, 11, 'Engine') end
         },
         {
-            title = 'Brakes (Level ' .. (brakesLevel == -1 and 'Stock' or brakesLevel) .. ')',
+            title = 'Brakes (Level ' .. (brakesLevel == -1 and 'Stock' or brakesLevel + 1) .. ')',
             description = 'Select brake upgrade level',
             onSelect = function() openModLevelMenu(veh, 12, 'Brakes') end
         },
         {
-            title = 'Transmission (Level ' .. (transLevel == -1 and 'Stock' or transLevel) .. ')',
+            title = 'Transmission (Level ' .. (transLevel == -1 and 'Stock' or transLevel + 1) .. ')',
             description = 'Select transmission upgrade level',
             onSelect = function() openModLevelMenu(veh, 13, 'Transmission') end
         },
         {
-            title = 'Suspension (Level ' .. (suspLevel == -1 and 'Stock' or suspLevel) .. ')',
+            title = 'Suspension (Level ' .. (suspLevel == -1 and 'Stock' or suspLevel + 1) .. ')',
             description = 'Select suspension upgrade level',
             onSelect = function() openModLevelMenu(veh, 15, 'Suspension') end
         },
@@ -758,18 +783,34 @@ end
 
 function openModLevelMenu(veh, modType, name)
     local options = {}
-    
-    -- Changed to -1 (Stock) to Level 3 only
-    for level = -1, 3 do
-        local label = level == -1 and 'Stock' or 'Level ' .. level
+
+    -- Stock option
+    table.insert(options, {
+        title = 'Stock',
+        description = 'Remove upgrade',
+        onSelect = function()
+            SetVehicleModKit(veh, 0)
+            SetVehicleMod(veh, modType, -1, false)
+            lib.notify({title = name, description = 'Stock', type = 'success'})
+            Wait(100)
+            openPerformanceModsMenu()
+        end
+    })
+
+    -- Dynamically get the actual number of upgrade levels this vehicle supports
+    local count = GetNumVehicleMods(veh, modType)
+    for level = 0, count - 1 do
+        -- GTA internally stores 0-based but players expect "Level 1", "Level 2", etc.
+        local label = 'Level ' .. (level + 1)
+        local capturedLevel = level
         table.insert(options, {
             title = label,
             onSelect = function()
                 SetVehicleModKit(veh, 0)
-                SetVehicleMod(veh, modType, level, false)
+                SetVehicleMod(veh, modType, capturedLevel, false)
                 lib.notify({title = name, description = label, type = 'success'})
                 Wait(100)
-                openPerformanceModsMenu() -- Return and refresh
+                openPerformanceModsMenu()
             end
         })
     end
@@ -951,6 +992,13 @@ function openPlateWindowHornMenu()
             end
         },
         {
+            title = 'Plate Type',
+            description = 'Change license plate style',
+            icon = 'credit-card',
+            arrow = true,
+            onSelect = openPlateTypeMenu
+        },
+        {
             title = 'Window Tint',
             description = 'Select window tint level',
             icon = 'window-restore',
@@ -1006,6 +1054,56 @@ function openWindowTintMenu()
         options = options
     })
     ShowContext('window_tint_menu')
+end
+
+-- Plate Type
+function openPlateTypeMenu()
+    local veh = GetVehiclePedIsIn(PlayerPedId(), false)
+    if veh == 0 then return end
+
+    local plateTypes = {
+        { id = 0,  name = 'Blue/White',          description = '' },
+        { id = 1,  name = 'Yellow/Black',         description = '' },
+        { id = 2,  name = 'Yellow/Blue',          description = '' },
+        { id = 3,  name = 'Blue/White 2',         description = '' },
+        { id = 4,  name = 'Blue/White 3',         description = 'Only use if LEO/Fire/EMS' },
+        { id = 5,  name = 'Yankton',              description = '' },
+        { id = 6,  name = 'Ecola',              description = '' },
+        { id = 7,  name = 'Las Venturas',           description = '' },
+        { id = 8,  name = 'Liberty City',            description = '' },
+        { id = 9,  name = 'LS Car Meet',         description = '' },
+        { id = 10, name = 'LS Panic',              description = '' },
+        { id = 11, name = 'LS Pounders',              description = '' },
+        { id = 12, name = 'Sprunk',        description = '' },
+    }
+
+    local current = GetVehicleNumberPlateTextIndex(veh)
+    local options = {}
+
+    for _, pt in ipairs(plateTypes) do
+        local isCurrent = (pt.id == current)
+        local capturedId = pt.id
+        table.insert(options, {
+            title       = pt.name,
+            description = (isCurrent and '✅ Currently selected — ' or '') .. pt.description,
+            icon        = isCurrent and 'check' or 'credit-card',
+            iconColor   = isCurrent and '#22c55e' or nil,
+            onSelect    = function()
+                SetVehicleNumberPlateTextIndex(veh, capturedId)
+                lib.notify({ title = 'Plate Type', description = pt.name, type = 'success' })
+                openPlateTypeMenu()
+            end
+        })
+    end
+
+    lib.registerContext({
+        id             = 'plate_type_menu',
+        title          = 'Plate Type',
+        menu           = 'plate_window_horn_menu',
+        preventClosing = true,
+        options        = options
+    })
+    ShowContext('plate_type_menu')
 end
 
 -- Horn Menu with Categories
@@ -1621,18 +1719,22 @@ function openExtrasLiveryMenu()
 
     table.insert(options, { title = 'Individual Extras', disabled = true })
 
+    -- GTA extras are 1-indexed; slot 0 is unused on nearly all vehicles
     local hasExtra = false
-    for i = 0, 14 do
+    for i = 1, 14 do
         if DoesExtraExist(veh, i) then
             hasExtra = true
             local on = IsVehicleExtraTurnedOn(veh, i)
+            local capturedI  = i
+            local capturedOn = on
             table.insert(options, {
-                title = 'Extra ' .. (i + 1),
-                description = 'Click to toggle',
-                icon = on and 'toggle-on' or 'toggle-off',
-                iconColor = on and '#22c55e' or '#ef4444',
-                onSelect = function()
-                    SetVehicleExtra(veh, i, on and 1 or 0)
+                title       = 'Extra ' .. i,
+                description = 'Currently: ' .. (on and 'Enabled' or 'Disabled'),
+                icon        = on and 'toggle-on' or 'toggle-off',
+                iconColor   = on and '#22c55e' or '#ef4444',
+                onSelect    = function()
+                    -- SetVehicleExtra: second param 0 = enable, 1 = disable
+                    SetVehicleExtra(veh, capturedI, capturedOn and 1 or 0)
                     openExtrasLiveryMenu()
                 end
             })
