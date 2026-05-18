@@ -67,11 +67,17 @@ local gtaColors = {
 
 -- ==================== BUILD FULL VEHICLE DATA ====================
 -- ==================== BUILD FULL VEHICLE DATA ====================
-local function BuildVehicleData(vehicle)
+local function BuildVehicleData(vehicle, modelName)
     SetVehicleModKit(vehicle, 0)
 
+    -- Prefer the explicitly passed name, then the statebag set at spawn time,
+    -- then fall back to the display name (vanilla vehicles only).
+    local resolvedModel = modelName
+        or Entity(vehicle).state.spawnModel
+        or string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)))
+
     local data = {
-        model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
+        model = resolvedModel,
         category = "civilian",
         colors = {},
         mods = {},
@@ -102,8 +108,6 @@ end
 
 -- ==================== SPAWN FUNCTION ====================
 function SpawnVehicle(model, savedData, onAfter)
-    lib.requestModel(model)
-
     local ped = PlayerPedId()
     local heading = GetEntityHeading(ped)
     local currentVehicle = GetVehiclePedIsIn(ped, false)
@@ -176,6 +180,7 @@ function SpawnVehicle(model, savedData, onAfter)
 
     TaskWarpPedIntoVehicle(ped, vehicle, -1)
     lastSpawned = vehicle
+    Entity(vehicle).state:set('spawnModel', model, false)
 
     lib.notify({ title = 'Vehicle Spawned', description = model, type = 'success' })
 

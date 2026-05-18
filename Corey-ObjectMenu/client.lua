@@ -74,12 +74,34 @@ local function startPlacementLoop(objectName, displayname, categoryIndex)
     inPlacementMode = true
 
     CreateThread(function()
-        local ok, err = pcall(lib.requestModel, joaat(objectName), 2000)
+        local modelHash = joaat(objectName)
+
+        -- Fast pre-check: if the hash isn't in the game's content index at all,
+        -- skip the stream request entirely and report it as truly invalid.
+        if not IsModelInCdimage(modelHash) then
+            inPlacementMode = false
+            lib.notify({
+                title       = 'Object Spawner',
+                description = '"' .. objectName .. '" was not found in the game files',
+                type        = 'error',
+                duration    = 4000
+            })
+            if categoryIndex then
+                openObjectListMenu(categoryIndex)
+            else
+                openCategoryMenu()
+            end
+            return
+        end
+
+        -- Use a generous timeout (10 s) so large/DLC props have time to stream in
+        -- without being incorrectly flagged as invalid.
+        local ok, err = pcall(lib.requestModel, modelHash, 10000)
         if not ok then
             inPlacementMode = false
             lib.notify({
                 title       = 'Object Spawner',
-                description = '"' .. objectName .. '" is not a valid/streamable model',
+                description = '"' .. objectName .. '" could not be streamed — try again',
                 type        = 'error',
                 duration    = 4000
             })
@@ -92,7 +114,7 @@ local function startPlacementLoop(objectName, displayname, categoryIndex)
         end
 
         -- Preview object is local-only (no network sync needed)
-        previewHandle = CreateObject(joaat(objectName), GetEntityCoords(cache.ped), false, false, false)
+        previewHandle = CreateObject(modelHash, GetEntityCoords(cache.ped), false, false, false)
         SetEntityAlpha(previewHandle, 180, false)
         SetEntityCollision(previewHandle, false, false)
         FreezeEntityPosition(previewHandle, true)
@@ -154,7 +176,7 @@ local function startPlacementLoop(objectName, displayname, categoryIndex)
 
                 -- Spawn a networked object so ALL players can see it
                 local netObj = CreateObjectNoOffset(
-                    joaat(objectName),
+                    modelHash,
                     finalCoords.x, finalCoords.y, finalCoords.z,
                     true,   -- networked
                     true,   -- mission entity
