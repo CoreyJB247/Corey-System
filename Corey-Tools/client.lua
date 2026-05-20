@@ -581,6 +581,92 @@ function OpenCoordsMenu()
     lib.showContext('coords_menu')
 end
 
+function OpenAopMenu()
+    lib.registerContext({
+        id = 'aop_menu',
+        title = 'Set AOP - Area of Patrol',
+        menu = 'misc_menu',  -- back button returns to misc menu
+        options = {
+            {
+                title = 'Los Santos',
+                description = 'Set AOP to Los Santos',
+                icon = 'map',
+                onSelect = function()
+                    ExecuteCommand('aop Los Santos')
+                    OpenAopMenu()
+                end
+            },
+            {
+                title = 'Blaine County',
+                description = 'Set AOP to Blaine County',
+                icon = 'map',
+                onSelect = function()
+                    ExecuteCommand('aop Blaine County')
+                    OpenAopMenu()
+                end
+            },
+            { title = '', disabled = true },
+            {
+                title = 'Paleto Bay',
+                description = 'Set AOP to Paleto Bay',
+                icon = 'map',
+                onSelect = function()
+                    ExecuteCommand('aop Paleto Bay')
+                    OpenAopMenu()
+                end
+            },
+            {
+                title = 'Sandy Shores',
+                description = 'Set AOP to Sandy Shores',
+                icon = 'map',
+                onSelect = function()
+                    ExecuteCommand('aop Sandy Shores')
+                    OpenAopMenu()
+                end
+            },
+            {
+                title = 'Grapeseed',
+                description = 'Set AOP to Sandy Shores',
+                icon = 'map',
+                onSelect = function()
+                    ExecuteCommand('aop Grapeseed')
+                    OpenAopMenu()
+                end
+            },
+            { title = '', disabled = true },
+            {
+                title = 'Vespucci',
+                description = 'Set AOP to Vespucci',
+                icon = 'map',
+                onSelect = function()
+                    ExecuteCommand('aop Vespucci')
+                    OpenAopMenu()
+                end
+            },
+            {
+                title = 'North Los Santos',
+                description = 'Set AOP to North Los Santos',
+                icon = 'map',
+                onSelect = function()
+                    ExecuteCommand('aop North Los Santos')
+                    OpenAopMenu()
+                end
+            },
+            {
+                title = 'South Los Santos',
+                description = 'Set AOP to South Los Santos',
+                icon = 'map',
+                onSelect = function()
+                    ExecuteCommand('aop South Los Santos')
+                    OpenAopMenu()
+                end
+            },
+        }
+    })
+
+    lib.showContext('aop_menu')
+end
+
 -- Online Players Context Menu
 -- Ping is server-side only, so we fetch it via callback.
 -- We also use the server-side player list so ALL players are shown,
@@ -698,7 +784,6 @@ function OpenMiscMenu()
                 title = 'Teleport to Waypoint',
                 description = 'Teleport to your map waypoint',
                 icon = 'location-crosshairs',
-                iconColor = '#27ae60',
                 onSelect = function()
                     TeleportToWaypoint()
                 end
@@ -707,16 +792,15 @@ function OpenMiscMenu()
                 title = 'Online Players',
                 description = 'View all connected players and their ping',
                 icon = 'users',
-                iconColor = '#1abc9c',
                 onSelect = function()
                     OpenPlayersMenu()
                 end
             },
+            { title = '', disabled = true },
             {
                 title = 'Toggle HUD',
                 description = hudHidden and 'Show HUD' or 'Hide HUD',
                 icon = 'eye',
-                iconColor = hudHidden and '#ff0000' or '#00ff00',
                 onSelect = function()
                     ToggleHUD()
                 end
@@ -725,7 +809,6 @@ function OpenMiscMenu()
                 title = 'Toggle Radar',
                 description = radarHidden and 'Show Radar' or 'Hide Radar',
                 icon = 'map',
-                iconColor = radarHidden and '#ff0000' or '#00ff00',
                 onSelect = function()
                     ToggleRadar()
                 end
@@ -734,17 +817,16 @@ function OpenMiscMenu()
                 title = 'Toggle RHUD',
                 description = 'Toggle the hud system',
                 icon = 'eye',
-                iconColor = '#9b59b6',
                 onSelect = function()
                     ExecuteCommand('rhud')
                     OpenMiscMenu()
                 end
             },
+            { title = '', disabled = true },
             {
                 title = 'Start Recording',
                 description = isRecording and '🔴 Already recording' or 'Begin a Rockstar Editor recording (/record)',
                 icon = 'circle',
-                iconColor = isRecording and '#ff0000' or '#2ecc71',
                 onSelect = function()
                     StartEditorRecording()
                 end
@@ -753,7 +835,6 @@ function OpenMiscMenu()
                 title = 'Save Clip',
                 description = 'Stop recording and save the clip (/saveclip)',
                 icon = 'floppy-disk',
-                iconColor = '#3498db',
                 onSelect = function()
                     StopAndSaveClip()
                 end
@@ -762,18 +843,25 @@ function OpenMiscMenu()
                 title = 'Discard Recording',
                 description = 'Stop recording and discard the clip (/discardclip)',
                 icon = 'trash',
-                iconColor = '#e74c3c',
                 onSelect = function()
                     DiscardRecording()
                 end
             },
+            { title = '', disabled = true },
             {
                 title = 'Copy Coordinates',
                 description = 'Open coordinates menu',
                 icon = 'location-dot',
-                iconColor = '#e74c3c',
                 onSelect = function()
                     OpenCoordsMenu()
+                end
+            },
+            {
+                title = 'Set AOP',
+                description = 'Set Area Of Patrol Location (Must be mutally agreed or set by admin)',
+                icon = 'map',
+                onSelect = function()
+                    OpenAopMenu()
                 end
             },
             {

@@ -151,6 +151,9 @@ function OpenAppearanceMenu()
             end,
         }
     end
+    
+    items[#items + 1] = { title = '', disabled = true }
+    
 
     if Config.Categories.SavedPeds then
         items[#items + 1] = {

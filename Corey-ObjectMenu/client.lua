@@ -671,7 +671,6 @@ OpenMainMenu = function()
                 title       = 'Spawn Object',
                 description = 'Browse categories and place objects',
                 icon        = 'fa-solid fa-circle-plus',
-                iconColor   = '#2ecc71',
                 onSelect    = function()
                     openCategoryMenu()
                 end
@@ -680,7 +679,6 @@ OpenMainMenu = function()
                 title       = 'Edit Object Position',
                 description = 'Select one of your objects and reposition it',
                 icon        = 'fa-solid fa-arrows-up-down-left-right',
-                iconColor   = '#3498db',
                 onSelect    = function()
                     selectObjectToEdit()
                 end
@@ -689,7 +687,6 @@ OpenMainMenu = function()
                 title       = 'Remove Mode',
                 description = 'Walk around and press [E] to delete nearby objects',
                 icon        = 'fa-solid fa-crosshairs',
-                iconColor   = '#e67e22',
                 onSelect    = function()
                     startRemoveMode()
                 end
@@ -698,7 +695,6 @@ OpenMainMenu = function()
                 title       = 'Remove Nearest Object',
                 description = 'Instantly delete the closest object within ' .. Config.DeleteRadius .. 'm',
                 icon        = 'fa-solid fa-trash',
-                iconColor   = '#e74c3c',
                 onSelect    = function()
                     local coords  = GetEntityCoords(cache.ped)
                     local nearest = getNearbyOwned(coords, Config.DeleteRadius)
@@ -725,7 +721,6 @@ OpenMainMenu = function()
                 title       = 'Remove All Nearby Objects',
                 description = 'Delete all your objects within ' .. Config.DeleteAllRadius .. 'm',
                 icon        = 'fa-solid fa-trash-can',
-                iconColor   = '#c0392b',
                 onSelect    = function()
                     local coords = GetEntityCoords(cache.ped)
                     local nearby = getNearbyOwned(coords, Config.DeleteAllRadius)
@@ -755,7 +750,6 @@ OpenMainMenu = function()
                 title       = 'My Spawned Objects',
                 description = spawnCount > 0 and (spawnCount .. ' active object(s)') or 'No objects spawned yet',
                 icon        = 'fa-solid fa-list',
-                iconColor   = spawnCount > 0 and '#f39c12' or '#7f8c8d',
                 onSelect    = function()
                     openSpawnedMenu()
                 end
