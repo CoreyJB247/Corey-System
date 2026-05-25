@@ -65,7 +65,36 @@ local gtaColors = {
     {id = 120, name = "Chrome"},
 }
 
--- ==================== BUILD FULL VEHICLE DATA ====================
+-- Full Repair Command
+RegisterCommand("fullrepair", function(source, args, rawCommand)
+    local ped = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(ped, false)
+
+    if vehicle == 0 then
+        lib.notify({
+            title = 'Full Repair',
+            description = 'You must be inside a vehicle to use this command.',
+            type = 'error'
+        })
+        return
+    end
+
+    SetVehicleFixed(vehicle)
+    SetVehicleDeformationFixed(vehicle)
+    WashDecalsFromVehicle(vehicle, 1.0)
+    SetVehicleEngineOn(vehicle, true, true, false)
+    SetVehicleUndriveable(vehicle, false)
+
+    lib.notify({
+        title = 'Full Repair',
+        description = 'Your vehicle has been fully repaired!',
+        type = 'success'
+    })
+
+end, false)
+
+TriggerEvent("chat:addSuggestion", "/fullrepair", "Only use this if your vehicle was damaged by a local or glitch.")
+
 -- ==================== BUILD FULL VEHICLE DATA ====================
 local function BuildVehicleData(vehicle, modelName)
     SetVehicleModKit(vehicle, 0)

@@ -175,14 +175,13 @@ local emergencyLoadouts = {
         icon        = 'shield-halved',
         iconColor   = '#0a64da',
         weapons     = {
-            { name = 'WEAPON_GLOCK20',          ammo = 200, components = { 'COMPONENT_GLOCK20_FLSH_01' } },
+            { name = 'WEAPON_COMBATPISTOL',          ammo = 200, components = { 'COMPONENT_AT_PI_FLSH' } },
             { name = 'WEAPON_FM1_BENELLIM4',    ammo = 130, components = { 'COMPONENT_FM1_BENELLIM4_FLSH_01' } },
             { name = 'WEAPON_COLBATON',         ammo = 0 },
             { name = 'WEAPON_FLASHLIGHT',       ammo = 0 },
-            { name = 'WEAPON_FLARE',            ammo = 6 },
-            { name = 'WEAPON_DD14_B',           ammo = 215, components = { 'COMPONENT_EXPS34_B', 'COMPONENT_BCM_B', 'COMPONENT_SFS14_B' } },
+            { name = 'WEAPON_FLARE',            ammo = 10 },
+            { name = 'WEAPON_DD14_B',           ammo = 240, components = { 'COMPONENT_EXPS34_B', 'COMPONENT_BCM_B', 'COMPONENT_SFS14_B' } },
             { name = 'WEAPON_STUNGUN',          ammo = 0 },
-            { name = 'WEAPON_FIREEXTINGUISHER', ammo = 0 },
         }
     },
     {
@@ -191,11 +190,11 @@ local emergencyLoadouts = {
         icon        = 'shield-halved',
         iconColor   = '#0a64da',
         weapons     = {
-            { name = 'WEAPON_GLOCK20',       ammo = 200, components = { 'COMPONENT_GLOCK20_FLSH_01' } },
+            { name = 'WEAPON_COMBATPISTOL',       ammo = 200, components = { 'COMPONENT_AT_PI_FLSH' } },
             { name = 'WEAPON_FM1_BENELLIM4', ammo = 130, components = { 'COMPONENT_FM1_BENELLIM4_FLSH_01' } },
             { name = 'WEAPON_COLBATON',      ammo = 0 },
             { name = 'WEAPON_FLASHLIGHT',    ammo = 0 },
-            { name = 'WEAPON_DD14_B',        ammo = 215, components = { 'COMPONENT_EXPS34_B', 'COMPONENT_BCM_B', 'COMPONENT_SFS14_B' } },
+            { name = 'WEAPON_DD14_B',        ammo = 240, components = { 'COMPONENT_EXPS34_B', 'COMPONENT_BCM_B', 'COMPONENT_SFS14_B' } },
         }
     },
     {
@@ -204,13 +203,13 @@ local emergencyLoadouts = {
         icon        = 'shield-halved',
         iconColor   = '#0a64da',
         weapons     = {
-            { name = 'WEAPON_GLOCK20',          ammo = 215, components = { 'COMPONENT_GLOCK20_FLSH_01' } },
+            { name = 'WEAPON_COMBATPISTOL',          ammo = 235, components = { 'COMPONENT_GLOCK20_FLSH_01' } },
             { name = 'WEAPON_FM1_BENELLIM4',    ammo = 130, components = { 'COMPONENT_FM1_BENELLIM4_FLSH_01' } },
             { name = 'WEAPON_FLASHLIGHT',       ammo = 0 },
             { name = 'WEAPON_FLARE',            ammo = 6 },
-            { name = 'WEAPON_DD14_B',           ammo = 600, components = { 'COMPONENT_EXPS34_B', 'COMPONENT_BCM_B', 'COMPONENT_SFS14_B' } },
+            { name = 'WEAPON_DD14_B',           ammo = 500, components = { 'COMPONENT_EXPS34_B', 'COMPONENT_BCM_B', 'COMPONENT_SFS14_B' } },
             { name = 'WEAPON_STUNGUN',          ammo = 0 },
-            { name = 'WEAPON_VICTUSXMR', ammo = 60, components = { 'COMPONENT_VICTUSXMR_CLIP_01', 'COMPONENT_VICTUSXMR_SCOPE_01' }},
+            { name = 'WEAPON_SNIPERRIFLE', ammo = 60, components = { 'COMPONENT_VICTUSXMR_CLIP_01', 'COMPONENT_VICTUSXMR_SCOPE_01' }},
         }
     },
     {
