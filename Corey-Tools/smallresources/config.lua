@@ -117,6 +117,7 @@ Config.TheBlips = {
     { title = "24/7 Store", colour = 2, id = 59, vector3 = vec3(198.72, -29.6, 69.92) },
     { title = "24/7 Store", colour = 2, id = 59, vector3 = vec3(529.24, -157.48, 57.04) },
     { title = "24/7 Store", colour = 2, id = 59, vector3 = vec3(-2544.12, 2314.08, 33.24) },
+    { title = "24/7 Store", colour = 2, id = 59, vector3 = vec3(266.8, -982.52, 29.36) },
 
     { title = "Liquor Store", colour = 33, id = 59, vector3 = vec3(-159.84, 6326.76, 31.76) },
     { title = "Liquor Store", colour = 33, id = 59, vector3 = vec3(-2971.96, 390.88, 15.6) },
@@ -151,6 +152,7 @@ Config.TheBlips = {
     { title = "House Interiors", colour = 31, id = 40, vector3 = vec3(921.2, -575.36, 57.8) },
     { title = "House Interiors", colour = 31, id = 40, vector3 = vec3(-3083.48, 220.64, 13.92) },
     { title = "House Interiors", colour = 31, id = 40, vector3 = vec3(1534.36, 2232.16, 78.76) },
+    { title = "House Interiors", colour = 31, id = 40, vector3 = vec3(-1097.4, -1669.92, 7.8) },
 
     { title = "Restaurant", colour = 50, id = 628, vector3 = vec3(-1652.76, -1040.28, 13.16) },
     { title = "Restaurant", colour = 50, id = 628, vector3 = vec3(-583.16, -870.64, 25.2) },

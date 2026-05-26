@@ -1789,7 +1789,214 @@ function openExtrasLiveryMenu()
     ShowContext('extras_livery_menu')
 end
 
+-- ==================== DOORS & WINDOWS ====================
+
+-- Door index labels used by GTA V natives
+local doorLabels = {
+    [0] = 'Front Left Door',
+    [1] = 'Front Right Door',
+    [2] = 'Rear Left Door',
+    [3] = 'Rear Right Door',
+    [4] = 'Hood',
+    [5] = 'Trunk / Boot',
+}
+
+-- Window index labels (GTA V: 0=FL,1=FR,2=RL,3=RR)
+local windowLabels = {
+    [0] = 'Front Left Window',
+    [1] = 'Front Right Window',
+    [2] = 'Rear Left Window',
+    [3] = 'Rear Right Window',
+}
+
+-- Helper: is a door currently open?
+local function isDoorOpen(veh, doorIndex)
+    return GetVehicleDoorAngleRatio(veh, doorIndex) > 0.0
+end
+
+function openDoorsMenu()
+    local veh = GetVehiclePedIsIn(PlayerPedId(), false)
+    if veh == 0 then
+        lib.notify({ title = 'Doors', description = 'You must be in a vehicle', type = 'error' })
+        return
+    end
+
+    local options = {}
+
+    -- All Doors Open / Close shortcuts
+    table.insert(options, {
+        title       = 'Open All Doors',
+        icon        = 'door-open',
+        iconColor   = '#22c55e',
+        description = 'Open every door, hood and trunk',
+        onSelect    = function()
+            for i = 0, 5 do
+                SetVehicleDoorOpen(veh, i, false, false)
+            end
+            lib.notify({ title = 'Doors', description = 'All doors opened', type = 'success' })
+            CreateThread(function() Wait(150) openDoorsMenu() end)
+        end
+    })
+
+    table.insert(options, {
+        title       = 'Close All Doors',
+        icon        = 'door-closed',
+        iconColor   = '#ef4444',
+        description = 'Close every door, hood and trunk',
+        onSelect    = function()
+            for i = 0, 5 do
+                SetVehicleDoorShut(veh, i, false)
+            end
+            lib.notify({ title = 'Doors', description = 'All doors closed', type = 'success' })
+            CreateThread(function() Wait(150) openDoorsMenu() end)
+        end
+    })
+
+    table.insert(options, { title = 'Individual Doors', disabled = true })
+
+    -- Individual door toggles
+    for i = 0, 5 do
+        local label  = doorLabels[i] or ('Door ' .. i)
+        local open   = isDoorOpen(veh, i)
+        local captI  = i
+        table.insert(options, {
+            title       = label,
+            description = open and '🟢 Open — click to close' or '🔴 Closed — click to open',
+            icon        = open and 'door-open' or 'door-closed',
+            iconColor   = open and '#22c55e' or '#ef4444',
+            onSelect    = function()
+                if isDoorOpen(veh, captI) then
+                    SetVehicleDoorShut(veh, captI, false)
+                    lib.notify({ title = label, description = 'Closed', type = 'success' })
+                else
+                    SetVehicleDoorOpen(veh, captI, false, false)
+                    lib.notify({ title = label, description = 'Opened', type = 'success' })
+                end
+                CreateThread(function() Wait(150) openDoorsMenu() end)
+            end
+        })
+    end
+
+    lib.registerContext({
+        id             = 'doors_menu',
+        title          = 'Door Control',
+        menu           = 'door_window_menu',
+        preventClosing = true,
+        options        = options
+    })
+    ShowContext('doors_menu')
+end
+
+function openWindowsMenu()
+    local veh = GetVehiclePedIsIn(PlayerPedId(), false)
+    if veh == 0 then
+        lib.notify({ title = 'Windows', description = 'You must be in a vehicle', type = 'error' })
+        return
+    end
+
+    local options = {}
+
+    -- All Windows Roll Up / Down shortcuts
+    table.insert(options, {
+        title       = 'Roll Down All Windows',
+        icon        = 'angles-down',
+        iconColor   = '#22c55e',
+        description = 'Lower every window',
+        onSelect    = function()
+            for i = 0, 3 do
+                RollDownWindow(veh, i)
+            end
+            lib.notify({ title = 'Windows', description = 'All windows lowered', type = 'success' })
+            CreateThread(function() Wait(150) openWindowsMenu() end)
+        end
+    })
+
+    table.insert(options, {
+        title       = 'Roll Up All Windows',
+        icon        = 'angles-up',
+        iconColor   = '#ef4444',
+        description = 'Raise every window',
+        onSelect    = function()
+            for i = 0, 3 do
+                RollUpWindow(veh, i)
+            end
+            lib.notify({ title = 'Windows', description = 'All windows raised', type = 'success' })
+            CreateThread(function() Wait(150) openWindowsMenu() end)
+        end
+    })
+
+    table.insert(options, { title = 'Individual Windows', disabled = true })
+
+    -- Individual window toggles
+    -- IsVehicleWindowIntact returns true when the window glass is present (rolled up)
+    for i = 0, 3 do
+        local label    = windowLabels[i] or ('Window ' .. i)
+        local rolledUp = IsVehicleWindowIntact(veh, i)
+        local captI    = i
+        table.insert(options, {
+            title       = label,
+            description = rolledUp and '🟢 Rolled up — click to lower' or '🔴 Rolled down — click to raise',
+            icon        = rolledUp and 'angles-up' or 'angles-down',
+            iconColor   = rolledUp and '#22c55e' or '#ef4444',
+            onSelect    = function()
+                if IsVehicleWindowIntact(veh, captI) then
+                    RollDownWindow(veh, captI)
+                    lib.notify({ title = label, description = 'Rolled down', type = 'success' })
+                else
+                    RollUpWindow(veh, captI)
+                    lib.notify({ title = label, description = 'Rolled up', type = 'success' })
+                end
+                CreateThread(function() Wait(150) openWindowsMenu() end)
+            end
+        })
+    end
+
+    lib.registerContext({
+        id             = 'windows_menu',
+        title          = 'Window Control',
+        menu           = 'door_window_menu',
+        preventClosing = true,
+        options        = options
+    })
+    ShowContext('windows_menu')
+end
+
+function OpenDoorWindowMenu()
+    local veh = GetVehiclePedIsIn(PlayerPedId(), false)
+    if veh == 0 then
+        lib.notify({ title = 'Door & Window Control', description = 'You must be in a vehicle', type = 'error' })
+        OpenHeavyVehicleManager()
+        return
+    end
+
+    local options = {
+        {
+            title       = 'Door Control',
+            description = 'Open, close, or toggle individual doors, hood & trunk',
+            icon        = 'door-open',
+            iconColor   = '#f97316',
+            arrow       = true,
+            onSelect    = openDoorsMenu
+        },
+        {
+            title       = 'Window Control',
+            description = 'Roll windows up or down individually or all at once',
+            icon        = 'angles-down',
+            iconColor   = '#3b82f6',
+            arrow       = true,
+            onSelect    = openWindowsMenu
+        },
+    }
+
+    lib.registerContext({
+        id             = 'door_window_menu',
+        title          = 'Door & Window Control',
+        menu           = 'corey_vehicle_manager',
+        preventClosing = true,
+        options        = options
+    })
+    ShowContext('door_window_menu')
+end
+
 -- ==================== COMMAND ====================
 RegisterCommand('vehmanager', OpenHeavyVehicleManager, false)
-
-print('^2Corey Vehicle Manager - Full Version Loaded^7')
